@@ -2,11 +2,14 @@ package com.BankingSystem;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
  
 public class bankManagement { 
                              
@@ -26,7 +29,7 @@ public class bankManagement {
             }
             
             Statement st = con.createStatement();
-            sql = "INSERT INTO customer_details (ac_no,cname,balance,pass_code) values(1002,'"+ name + "',1000," + passCode + ")";
+            sql = "INSERT INTO customer_details (ac_no,cname,balance,pass_code) values(1003,'"+ name + "',1000," + passCode + ")";
  
            
             if (st.executeUpdate(sql) == 1) {
@@ -56,21 +59,34 @@ public class bankManagement {
             ResultSet rs = st.executeQuery();
            
             BufferedReader sc = new BufferedReader( new InputStreamReader(System.in));
- 
+            
             if (rs.next()) {
                 
  
                 int ch = 5;
                 int amt = 0;
                 int senderAc = rs.getInt("ac_no");
-                int receiveAc;
+               String cname = rs.getString("cname");
                 int balance= Integer.parseInt(rs.getString("balance"));
-                System.out.println("balance : "+balance);
-                System.out.println( "Hallo, " + rs.getString("cname"));
-                System.out.println("sender account no :"+senderAc);
+                int receiveAc;
+                System.out.println("\n");
+               // System.out.println("balance : "+balance);
+                System.out.println( "Hello, " + cname +"Welcome Back");
+                System.out.println("\n");
+                System.out.println("Your Account Details ");
+                System.out.print("------------------------------------------ \n");
+ 				
+                System.out.println( " | Account No. | Name | Balance |");
+                System.out.print("------------------------------------------ \n");
+ 				
+                System.out.println( " | "+senderAc+" | " + cname + " | "+ balance+" | ");
+                System.out.print("-------------------------------------------\n");
+ 				
+                //System.out.println("sender account no :"+senderAc);
                 while (true) {
                     try {
-                        
+                    	System.out.println("\n");
+                    	System.out.println("Perform Operations :");
                         System.out.println("1)Transfer Money");
                         System.out.println("2)Deposit Money");
                         System.out.println("3)Withdraw Money");
@@ -103,27 +119,35 @@ public class bankManagement {
                             		 
                                      if (stmt.executeUpdate() == 1) {
                                          System.out.println("Money transfer sucessfull");
+                                         System.out.println("Your Account Balance : Rs."+balance);
+                                         try {
+                                        	 
+                                        	 PreparedStatement stmt1 = con.prepareStatement("insert into transaction (ac_no,cname,bank_name,transaction_type,receiver_acno,amount,balance,status) values (?,?,'SBI','Transfer',?,?,?,'complete')");
+                                        	 stmt1.setInt(1,senderAc);
+                                             stmt1.setString(2,cname);
+                                             stmt1.setInt(3,receiveAc);
+                                             stmt1.setInt(4,amt);
+                                             stmt1.setInt(5,balance);
+                                             if (stmt1.executeUpdate() == 1) {
+                                                 System.out.println("Inserted into transaction table");
+                                             }
+                                         }
+                                            
+                                             catch(Exception e){
+                                  
+                                            	 System.out.println(e);
                                          
                                      }
+                                     System.out.print("---------------------------------------------------- \n");
+                                     }
+                            	 }
                                      
-                                 }
+                                 
                                 
                                  catch (Exception e) {
                                      e.printStackTrace();
                                  }
                             }
- 
-                           /* if (bankManagement
-                                    .transferMoney(
-                                        senderAc, receiveAc,
-                                        amt)) {
-                                System.out.println(
-                                    "MSG : Money Sent Successfully!\n");
-                            }
-                            else {
-                                System.out.println(
-                                    "ERR :  Failed!\n");
-                            } */
                         }
                         
                         
@@ -145,9 +169,12 @@ public class bankManagement {
                                      stmt.setInt(2,senderAc);
                             		 
                                      if (stmt.executeUpdate() == 1) {
-                                         System.out.println("Money Credited sucessfully!");
+                                         System.out.println("Money Credited sucessfully");
+                                         System.out.println("Your Account Balance : Rs."+balance);
                                          
                                      }
+                                     System.out.print("---------------------------------------------------- \n");
+                     				
                                      
                                  
                             	 }
@@ -180,8 +207,11 @@ public class bankManagement {
                             		 
                                      if (stmt.executeUpdate() == 1) {
                                          System.out.println("Money Debitd Sucessfully");
+                                         System.out.println("Your Account Balance : Rs."+balance);
                                          
                                      }
+                                     System.out.print("---------------------------------------------------- \n");
+                     				
                                      
                                  }
                                 
@@ -194,8 +224,33 @@ public class bankManagement {
                         
                         else if (ch == 4) {
  
-                        	System.out.println( "Your Balance is :, " + rs.getString("balance"));
-                            
+                        	
+                        	String sql1 = "";
+                        	sql1 = "select * from customer_details where cname='"+ name + "' and pass_code=" + passCode;
+                            PreparedStatement st1= con.prepareStatement(sql);
+                            ResultSet rs1 = st.executeQuery();
+                            if (rs1.next()) {
+                            System.out.println( "Your Balance is : " + rs1.getString("balance"));
+                            }
+                            System.out.print("---------------------------------------------------- \n");
+            				
+                        }
+else if (ch == 5) {
+ 
+                        	
+                        	String sql1 = "";
+                        	
+                        	sql1 = "select * from transaction where ac_no="+ senderAc ;
+                            PreparedStatement st1= con.prepareStatement(sql1);
+                            ResultSet rs1 = st1.executeQuery();
+                            if (rs1.next()) {
+                            	 System.out.println( "| Account No | Name | Bank | Transaction Type | Receiver Acc_no | Amount | Balance | Date | Status");
+                            	 System.out.println( "|"+ rs1.getString("ac_no") + "|" +rs1.getString("cname")+ "|"+ rs1.getString("bank_name") +"|"+ rs1.getString("transaction_type") +"|"+ rs1.getString("receiver_acno") +"|"+ rs1.getString("amount") +"|"+ rs1.getString("balance") +"|"+ rs1.getString("date_time") +"|"+ rs1.getString("status"));
+                                 
+                            	 System.out.println( "Your Balance is : " + rs1.getString("balance"));
+                            }
+                            System.out.print("---------------------------------------------------- \n");
+            				
                         }
                         else if (ch == 6) {
                             break;
@@ -204,6 +259,8 @@ public class bankManagement {
                             System.out.println(
                                 "Err : Enter Valid input!\n");
                         }
+                        System.out.print("---------------------------------------------------- \n");
+        				
                     }
                     catch (Exception e) {
                         e.printStackTrace();

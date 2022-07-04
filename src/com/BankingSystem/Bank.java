@@ -18,11 +18,12 @@ public class Bank {
 
 		while (true) {
 			System.out.println(
-				"\n ->|| Welcome to InBank ||<- \n");
+				"\n ******************|| Welcome to InBank || ****************** \n");
 			System.out.println("1)Create Account");
 			System.out.println("2)Login Account");
 
 			try {
+				System.out.print("----------------------------------------------------");
 				System.out.print("\n Enter Input:"); //user input
 				ch = Integer.parseInt(sc.readLine());
 
