@@ -145,7 +145,7 @@ public class bankManagement {
                                      stmt.setInt(2,senderAc);
                             		 
                                      if (stmt.executeUpdate() == 1) {
-                                         System.out.println("Money Credited sucessfully");
+                                         System.out.println("Money Credited sucessfully!");
                                          
                                      }
                                      
