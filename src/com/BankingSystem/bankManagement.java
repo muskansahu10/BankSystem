@@ -235,7 +235,7 @@ public class bankManagement {
                             System.out.print("---------------------------------------------------- \n");
             				
                         }
-else if (ch == 5) {
+                        else if (ch == 5) {
  
                         	
                         	String sql1 = "";
